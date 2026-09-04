@@ -1,0 +1,20 @@
+.agents/
+.claude/
+/docs/
+.venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# données et artefacts lourds
+/data/
+/checkpoints/
+*.pt
+*.pth
+*.model
+*.sp
+reports/**/*.png
+optuna*.db
+reports/optuna/stub/
+
+CLAUDE.md

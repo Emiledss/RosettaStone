@@ -1,0 +1,16 @@
+bert-score
+datasets<4.0.0
+evaluate
+huggingface_hub
+ipykernel
+matplotlib
+nltk
+numpy
+optuna
+pandas
+pytest
+ruff
+sacrebleu
+seaborn
+sentencepiece
+torch
