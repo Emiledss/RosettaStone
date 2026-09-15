@@ -7,14 +7,16 @@ garder le gate rapide.
 
 from __future__ import annotations
 
+import itertools
 import math
 
+import pytest
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
 from src.models.seq2seq import build_model
-from src.training.loop import train_and_validate
+from src.training.loop import _scheduled_teacher_forcing_ratio, train_and_validate
 
 VOCAB_SIZE = 8
 SEQ_LEN = 6
@@ -209,4 +211,166 @@ def test_loss_ignore_le_padding() -> None:
 
     assert torch.allclose(loss_avec_padding, loss_sans_padding, atol=1e-5)
 
+
+# ---------------------------------------------------------------------------
+# Lot G : scheduled sampling (teacher_forcing_decay) et objectif dirigé
+# (objective_fn / direction).
+# ---------------------------------------------------------------------------
+def test_scheduled_sampling_decroit_exponentiellement_et_est_enregistre() -> None:
+    """Le ratio décroît exponentiellement depuis `teacher_forcing_ratio` au taux
+    `teacher_forcing_decay`, et l'historique l'enregistre epoch par epoch."""
+    torch.manual_seed(0)
+    result = train_and_validate(
+        _mini_model(),
+        _mini_loaders(),
+        max_epochs=5,
+        lr=0.01,
+        grad_clip=1.0,
+        teacher_forcing_ratio=1.0,
+        patience=5,
+        device=torch.device("cpu"),
+        pad_id=0,
+        teacher_forcing_decay=0.5,
+    )
+
+    ratios = result["history"]["teacherForcingRatio"]
+    assert len(ratios) == 5
+    for obtenu, cible in zip(ratios, [1.0, 0.5, 0.25, 0.125, 0.0625]):
+        assert obtenu == pytest.approx(cible)
+
+
+def test_scheduled_sampling_decay_1_reproduit_l_ancien_comportement() -> None:
+    """`teacher_forcing_decay == 1.0` -> ratio constant (non-régression :
+    comportement identique à avant le scheduled sampling)."""
+    torch.manual_seed(0)
+    result = train_and_validate(
+        _mini_model(),
+        _mini_loaders(),
+        max_epochs=4,
+        lr=0.01,
+        grad_clip=1.0,
+        teacher_forcing_ratio=0.5,
+        patience=4,
+        device=torch.device("cpu"),
+        pad_id=0,
+        teacher_forcing_decay=1.0,
+    )
+
+    assert result["history"]["teacherForcingRatio"] == [0.5, 0.5, 0.5, 0.5]
+
+
+def test_scheduled_sampling_est_independant_du_budget_d_epochs() -> None:
+    """LE test central du lot G : à `decay` fixé, le ratio de l'epoch `e` est le
+    MÊME quel que soit `max_epochs`.
+
+    C'est la propriété qui rend l'hyperparamètre transférable de la recherche
+    Optuna (8 epochs) à l'entraînement final (~15 epochs). L'ancienne
+    décroissance, normalisée sur `max_epochs`, ne l'avait pas : la même valeur y
+    décrivait deux vitesses différentes selon le budget.
+    """
+    ratios = {}
+    for budget in (3, 6):
+        torch.manual_seed(0)
+        result = train_and_validate(
+            _mini_model(),
+            _mini_loaders(),
+            max_epochs=budget,
+            lr=0.01,
+            grad_clip=1.0,
+            teacher_forcing_ratio=1.0,
+            patience=budget,
+            device=torch.device("cpu"),
+            pad_id=0,
+            teacher_forcing_decay=0.8,
+        )
+        ratios[budget] = result["history"]["teacherForcingRatio"]
+
+    assert len(ratios[3]) == 3 and len(ratios[6]) == 6
+    for court, long in zip(ratios[3], ratios[6]):
+        assert court == pytest.approx(long)
+
+
+def test_scheduled_sampling_tend_vers_zero() -> None:
+    """Le plancher est 0 par construction : le ratio s'en approche quand les
+    epochs augmentent, ce qui aligne l'entraînement sur les conditions
+    d'inférence (génération libre pure)."""
+    suite = [_scheduled_teacher_forcing_ratio(e, 1.0, 0.7) for e in range(1, 21)]
+    assert suite[0] == pytest.approx(1.0)
+    assert all(b < a for a, b in itertools.pairwise(suite))
+    assert suite[-1] < 0.01
+
+
+def test_objective_fn_remplace_val_loss_pour_on_epoch_end_et_best_objective() -> None:
+    """Quand `objective_fn` est fourni, sa valeur (pas la val loss) est passée à
+    `on_epoch_end` et devient `bestObjective` -- la val loss reste calculée et
+    enregistrée dans `history` en parallèle."""
+    torch.manual_seed(0)
+    loaders = _mini_loaders()
+    model = _mini_model()
+
+    valeurs_objectif = [10.0, 20.0, 15.0]  # une par epoch, indépendante de la val loss réelle
+    appels_on_epoch_end: list[tuple[int, float]] = []
+
+    def objective_fn(m: nn.Module) -> float:
+        assert m is model
+        return valeurs_objectif[len(appels_on_epoch_end)]
+
+    def on_epoch_end(epoch: int, metric_value: float) -> bool:
+        appels_on_epoch_end.append((epoch, metric_value))
+        return False
+
+    result = train_and_validate(
+        model,
+        loaders,
+        max_epochs=3,
+        lr=0.01,
+        grad_clip=1.0,
+        teacher_forcing_ratio=0.5,
+        patience=3,
+        device=torch.device("cpu"),
+        pad_id=0,
+        on_epoch_end=on_epoch_end,
+        objective_fn=objective_fn,
+        direction="maximize",
+    )
+
+    assert [v for _, v in appels_on_epoch_end] == valeurs_objectif
+    assert result["bestObjective"] == pytest.approx(20.0)  # le maximum, pas la dernière valeur
+    assert "bestValLoss" in result and math.isfinite(result["bestValLoss"])
+    assert len(result["history"]["valLoss"]) == 3  # val loss toujours calculée en parallèle
+
+
+def test_direction_maximize_early_stopping_et_meilleur_est_le_maximum() -> None:
+    """`direction=\"maximize\"` : l'early stopping se déclenche quand la métrique
+    ne s'améliore plus pendant `patience` epochs, et `bestObjective` reste le
+    maximum atteint (pas la dernière valeur, ni un minimum)."""
+    torch.manual_seed(0)
+    loaders = _mini_loaders()
+    model = _mini_model()
+
+    valeurs_objectif = [0.1, 0.5, 0.9, 0.85, 0.80, 0.70]  # pic à l'epoch 3, puis ça baisse
+    compteur = {"i": 0}
+
+    def objective_fn(m: nn.Module) -> float:
+        valeur = valeurs_objectif[compteur["i"]]
+        compteur["i"] += 1
+        return valeur
+
+    result = train_and_validate(
+        model,
+        loaders,
+        max_epochs=6,
+        lr=0.01,
+        grad_clip=1.0,
+        teacher_forcing_ratio=0.5,
+        patience=2,
+        device=torch.device("cpu"),
+        pad_id=0,
+        objective_fn=objective_fn,
+        direction="maximize",
+    )
+
+    # stoppé 2 epochs après le pic (epoch 3) : epochs 4 et 5 sans amélioration -> arrêt après l'epoch 5
+    assert len(result["history"]["trainLoss"]) == 5
+    assert result["bestObjective"] == pytest.approx(0.9)
 

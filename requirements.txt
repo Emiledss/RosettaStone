@@ -1,6 +1,7 @@
 bert-score
 datasets<4.0.0
 evaluate
+flask
 huggingface_hub
 ipykernel
 matplotlib
@@ -9,6 +10,7 @@ numpy
 optuna
 pandas
 pytest
+python-pptx
 ruff
 sacrebleu
 seaborn

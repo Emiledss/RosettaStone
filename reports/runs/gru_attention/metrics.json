@@ -1,0 +1,22 @@
+[
+  {
+    "run": "gru_attention",
+    "bin": "courte",
+    "n": 39092,
+    "sacrebleu": 14.483447658087364,
+    "meteor": 0.43315893518239024,
+    "bertscorePrecision": 0.7872956991195679,
+    "bertscoreRecall": 0.8350855708122253,
+    "bertscoreF1": 0.8099323511123657
+  },
+  {
+    "run": "gru_attention",
+    "bin": "longue",
+    "n": 425,
+    "sacrebleu": 4.727768643193203,
+    "meteor": 0.20119699519567108,
+    "bertscorePrecision": 0.7546266913414001,
+    "bertscoreRecall": 0.7533206343650818,
+    "bertscoreF1": 0.7538042068481445
+  }
+]

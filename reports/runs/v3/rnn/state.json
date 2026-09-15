@@ -1,0 +1,21 @@
+{
+  "steps": {
+    "train": "done",
+    "generate": "pending",
+    "metrics": "pending"
+  },
+  "runId": "rnn",
+  "params": {
+    "tokenizationMethod": "unigram",
+    "vocabSize": 6169,
+    "learningRate": 0.002647311660645719,
+    "hiddenDim": 1024,
+    "embDim": 256,
+    "dropout": 0.30000000000000004,
+    "teacherForcingDecay": 0.87,
+    "tokenizationConfig": "unigram6169"
+  },
+  "lastEpoch": 16,
+  "bestValLoss": 6.88938751623228,
+  "bestObjective": 6.88938751623228
+}

@@ -2,7 +2,7 @@
 
 Transpose en snake_case la logique de chargement déjà validée dans le notebook
 AED (cellule 5) : deux chemins de chargement, avec bascule automatique via la
-stratégie "auto" (voir ADR-0001).
+stratégie "auto".
 
 - `load_from_huggingface` : chemin officiel via `datasets` (nécessite
   `datasets<4.0` et `trust_remote_code=True`, dataset "à script").
@@ -100,7 +100,7 @@ def load_raw_corpus(strategy: str = "auto", data_dir: str = "data") -> pd.DataFr
     elif strategy == "auto":
         try:
             df = load_from_huggingface(DATASET_NAME, LANG1, LANG2)
-        except Exception as exc:  # noqa: BLE001 - repli volontaire (ADR-0001) sur tout échec HF
+        except Exception as exc:  # noqa: BLE001 - repli volontaire sur tout échec HF
             print(f"Chargement via `datasets` indisponible ({type(exc).__name__}: {exc})")
             print("--> repli sur l'archive OPUS brute (source identique).")
             df = load_from_opus(LANG1, LANG2, CORPUS_VERSION, data_dir)

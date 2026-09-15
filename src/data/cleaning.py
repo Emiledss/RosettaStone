@@ -3,7 +3,7 @@
 Le comptage de mots utilisé pour le ratio de longueur et le seuil `max_words`
 passe par `src.data.text.count_words` (Python pur, Unicode-correct) — jamais par
 `.str.count()` / `.str.contains()` sur les colonnes pandas (piège pandas 3 /
-PyArrow / RE2 documenté dans CLAUDE.md).
+PyArrow / RE2 : la classe "mot" de ce moteur n'est pas Unicode).
 """
 
 from __future__ import annotations

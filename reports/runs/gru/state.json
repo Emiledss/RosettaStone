@@ -1,0 +1,21 @@
+{
+  "steps": {
+    "train": "done",
+    "generate": "done",
+    "metrics": "done"
+  },
+  "runId": "gru",
+  "params": {
+    "tokenizationConfig": "unigram4k",
+    "learningRate": 0.002265436524796412,
+    "hiddenDim": 512,
+    "embDim": 256,
+    "dropout": 0.30000000000000004,
+    "teacherForcingDecay": 0.98
+  },
+  "lastEpoch": 15,
+  "bestValLoss": 4.918116340002456,
+  "bestObjective": 4.918116340002456,
+  "nHypotheses": 39517,
+  "metricsPath": "..\\reports\\runs\\gru\\metrics.json"
+}

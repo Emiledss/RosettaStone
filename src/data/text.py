@@ -3,13 +3,12 @@
 Transpose en snake_case le tokeniseur validé dans le notebook AED (cellule 18,
 tests cellules 19-20). Règles préservées :
 
-- l'apostrophe d'élision est une **frontière de mot** (`l'ami` = 2 unités,
-  ADR-0002), sauf pour une liste d'exceptions insécables (`aujourd'hui`,
-  `quelqu'un`, ...) ;
-- le clitique reste attaché **à gauche en FR**, **à droite en EN** (ADR-0004) ;
+- l'apostrophe d'élision est une **frontière de mot** (`l'ami` = 2 unités),
+  sauf pour une liste d'exceptions insécables (`aujourd'hui`, `quelqu'un`, ...) ;
+- le clitique reste attaché **à gauche en FR**, **à droite en EN** ;
 - la ponctuation seule n'est pas comptée comme un mot, par défaut.
 
-⚠️ Piège pandas 3 / PyArrow (voir CLAUDE.md) : ne jamais utiliser `.str.count()` /
+⚠️ Piège pandas 3 / PyArrow : ne jamais utiliser `.str.count()` /
 `.str.contains()` pour ce genre de comptage, le moteur RE2 traite `\\w` en ASCII
 seul (`"été"` y compterait 1 caractère de mot au lieu de 3). Tout ce module est
 écrit en Python pur (`re` + `str.isalnum()`), Unicode-correct.
@@ -155,7 +154,7 @@ def count_words(text: str, lang: str) -> int:
 # Reproduit EXACTEMENT `TOKEN_STRIP_RE` / `normalizeToken` du notebook AED
 # (cellule 34) : `\w` est ici évalué par le module `re` de Python (Unicode-
 # correct), jamais par une méthode `.str.*` de pandas (moteur RE2, ASCII seul
-# sur `\w` -- piège documenté dans CLAUDE.md).
+# sur `\w`).
 TOKEN_STRIP_RE = re.compile(
     r"^[^\w" + re.escape(APOSTROPHES) + r"]+|[^\w" + re.escape(APOSTROPHES) + r"]+$"
 )

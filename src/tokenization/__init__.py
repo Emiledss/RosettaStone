@@ -1,6 +1,6 @@
 """Vocabulaires, numérisation et statistiques de tokenisation (étapes 4, 5, 5bis).
 
-Symboles du contrat consommés par `notebooks/Rosetta_Optuna.ipynb` :
+Symboles du contrat consommés par `notebooks/Rosetta_Modelisation.ipynb` :
 `build_vocabs` (étape 4) et `make_dataloaders` (étape 5).
 """
 
@@ -11,6 +11,7 @@ from src.tokenization.vocab_builder import (
     Vocabulary,
     WordVocabulary,
     build_vocabs,
+    config_name,
 )
 
 __all__ = [
@@ -20,5 +21,6 @@ __all__ = [
     "Vocabulary",
     "WordVocabulary",
     "build_vocabs",
+    "config_name",
     "make_dataloaders",
 ]

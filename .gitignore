@@ -1,6 +1,6 @@
 .agents/
 .claude/
-/docs/
+docs/decisions/
 .venv/
 __pycache__/
 *.py[cod]
@@ -16,5 +16,7 @@ __pycache__/
 reports/**/*.png
 optuna*.db
 reports/optuna/stub/
+reports/runs_hf/
+reports/soutenance/figures/
 
 CLAUDE.md

@@ -1,0 +1,21 @@
+{
+  "steps": {
+    "train": "done",
+    "generate": "done",
+    "metrics": "done"
+  },
+  "runId": "rnn",
+  "params": {
+    "tokenizationConfig": "bpe4k",
+    "learningRate": 0.0012833882623639204,
+    "hiddenDim": 256,
+    "embDim": 128,
+    "dropout": 0.35000000000000003,
+    "teacherForcingDecay": 0.96
+  },
+  "lastEpoch": 14,
+  "bestValLoss": 6.378487653546519,
+  "bestObjective": 6.378487653546519,
+  "nHypotheses": 39517,
+  "metricsPath": "..\\reports\\runs\\rnn\\metrics.json"
+}

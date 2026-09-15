@@ -1,0 +1,16 @@
+{
+  "cellType": "rnn",
+  "bestObjective": 1.0473868722543425,
+  "bestParams": {
+    "tokenizationMethod": "unigram",
+    "vocabSize": 6169,
+    "learningRate": 0.002647311660645719,
+    "hiddenDim": 1024,
+    "embDim": 256,
+    "dropout": 0.30000000000000004,
+    "teacherForcingDecay": 0.87
+  },
+  "nTrialsCompleted": 8,
+  "nTrialsTotal": 40,
+  "pipelineReady": true
+}

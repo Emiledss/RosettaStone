@@ -59,8 +59,8 @@ def split_by_target_group(
     (mêmes colonnes que `df`), `diagnostic` a une ligne par part avec `n_paires`,
     `n_groupes`, `n_groupes_longs`, `proportion_longs`.
 
-    Émet un `warnings.warn` (ne décide pas à la place de l'humain) si le nombre
-    absolu de groupes longs dans le test tombe sous `MIN_GROUPES_LONGS_TEST`.
+    Émet un `warnings.warn` (n'interrompt pas le split) si le nombre absolu de
+    groupes longs dans le test tombe sous `MIN_GROUPES_LONGS_TEST`.
     """
     if abs(sum(ratios) - 1.0) > 1e-9:
         raise ValueError(f"ratios doit sommer à 1.0, reçu {ratios}")

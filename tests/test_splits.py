@@ -3,7 +3,7 @@
 Les tests de logique (rapides, toujours exécutés) tournent sur des fixtures
 synthétiques construites à la main -- pas sur le corpus réel, pour que le gate
 reste rapide. Le test d'intégration sur le corpus réel est sauté automatiquement
-si `data/processed/` est absent (voir `.agents/plan-etapes-0-3.md`).
+si `data/processed/` est absent.
 """
 
 from __future__ import annotations
@@ -78,7 +78,7 @@ def test_clean_corpus_retire_exactement_ce_qui_est_attendu_dans_l_ordre() -> Non
 
 def test_deduplicate_pairs_retire_doublons_exacts_et_preserve_alignements_1_n() -> None:
     """Les doublons exacts (fr, en) sont retirés ; un alignement 1->N (même cible
-    EN, sources FR différentes) est préservé (ADR-0005 / étape 2 du plan)."""
+    EN, sources FR différentes) est préservé (étape 2 du plan)."""
     df = build_cleaning_fixture()
     cleaned, _journal = clean_corpus(df)
     deduped, n_dup = deduplicate_pairs(cleaned)
@@ -206,7 +206,7 @@ def test_split_ratios_invalides_leve_une_erreur() -> None:
 def test_count_words_apostrophe_et_accents() -> None:
     """`l'ami` = 2 unités (élision), `aujourd'hui` = 1 (exception insécable), et
     les caractères accentués sont bien traités comme des lettres (piège RE2/ASCII
-    documenté dans CLAUDE.md : `.str.count()` sur colonne PyArrow y traiterait
+    connu : `.str.count()` sur colonne PyArrow y traiterait
     "été" comme 1 caractère de mot au lieu de 3)."""
     assert count_words("l'ami", "fr") == 2
     assert count_words("aujourd'hui", "fr") == 1

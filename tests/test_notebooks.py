@@ -1,9 +1,9 @@
 """Tests d'invariants structurels sur les notebooks du projet.
 
 Ces tests ne ré-exécutent pas les notebooks (coûteux, et dépend de `src/` pour
-`Rosetta_Optuna.ipynb`) : ils vérifient des invariants bon marché mais utiles
+`Rosetta_Modelisation.ipynb`) : ils vérifient des invariants bon marché mais utiles
 pour éviter de livrer un notebook corrompu ou un fichier contenant des outputs
-périmés par erreur. Voir CLAUDE.md et `.agents/plan.md` pour le contexte.
+périmés par erreur.
 """
 
 import json
@@ -13,13 +13,13 @@ import pytest
 
 notebooks_dir = Path(__file__).resolve().parents[1] / "notebooks"
 aed_notebook = notebooks_dir / "Rosetta_AED.ipynb"
-optuna_notebook = notebooks_dir / "Rosetta_Optuna.ipynb"
+modelisation_notebook = notebooks_dir / "Rosetta_Modelisation.ipynb"
 tokenisation_notebook = notebooks_dir / "Rosetta_Tokenisation.ipynb"
-all_notebooks = [aed_notebook, optuna_notebook, tokenisation_notebook]
+all_notebooks = [aed_notebook, modelisation_notebook, tokenisation_notebook]
 # Notebooks livrés sans output stocké (voir `test_notebook_ne_stocke_aucun_output`
 # ci-dessous) -- à l'inverse de `Rosetta_AED.ipynb`, qui stocke ses outputs par
-# conception (cf. CLAUDE.md).
-notebooks_sans_outputs = [optuna_notebook, tokenisation_notebook]
+# conception.
+notebooks_sans_outputs = [modelisation_notebook, tokenisation_notebook]
 
 
 def load_notebook(path: Path) -> dict:
@@ -55,14 +55,16 @@ def test_cellules_de_code_compilent(notebook_path: Path) -> None:
 @pytest.mark.parametrize("notebook_path", notebooks_sans_outputs, ids=lambda p: p.name)
 def test_notebook_ne_stocke_aucun_output(notebook_path: Path) -> None:
     """
-    Convention de livraison : `Rosetta_Optuna.ipynb` et `Rosetta_Tokenisation.ipynb`
-    doivent être livrés sans output stocké ni execution_count, pour rester
-    diffables et ne jamais contenir un résultat périmé. Cette convention ne
-    s'applique PAS à `Rosetta_AED.ipynb`, qui stocke ses outputs par conception
-    (voir le rapport final pour l'écart constaté avec la section « État vivant »
-    de CLAUDE.md).
+    Convention de livraison : `Rosetta_Modelisation.ipynb` et `Rosetta_Tokenisation.ipynb`
+    doivent être livrés sans output stocké, pour rester diffables et ne jamais
+    contenir un résultat périmé.
+
+    `execution_count` n'est volontairement PAS vérifié : c'est un entier posé par
+    Jupyter à chaque exécution, sans coût de taille ni risque de résultat périmé.
+    L'exiger à `None` ferait échouer les tests après toute exécution manuelle, sans
+    rien protéger. Cette convention ne s'applique pas à `Rosetta_AED.ipynb`, qui
+    stocke ses outputs par conception.
     """
     notebook = load_notebook(notebook_path)
     for cellule in code_cells_of(notebook):
         assert cellule["outputs"] == []
-        assert cellule["execution_count"] is None

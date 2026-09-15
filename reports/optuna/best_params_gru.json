@@ -1,0 +1,16 @@
+{
+  "cellType": "gru",
+  "bestObjective": 12.457704491657038,
+  "bestParams": {
+    "tokenizationMethod": "unigram",
+    "vocabSize": 6663,
+    "learningRate": 0.0024238590666922992,
+    "hiddenDim": 1024,
+    "embDim": 256,
+    "dropout": 0.0,
+    "teacherForcingDecay": 1.0
+  },
+  "nTrialsCompleted": 9,
+  "nTrialsTotal": 41,
+  "pipelineReady": true
+}

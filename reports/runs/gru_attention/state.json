@@ -1,0 +1,21 @@
+{
+  "steps": {
+    "train": "done",
+    "generate": "done",
+    "metrics": "done"
+  },
+  "runId": "gru_attention",
+  "params": {
+    "tokenizationConfig": "unigram4k",
+    "learningRate": 0.002265436524796412,
+    "hiddenDim": 512,
+    "embDim": 256,
+    "dropout": 0.30000000000000004,
+    "teacherForcingDecay": 0.98
+  },
+  "lastEpoch": 4,
+  "bestValLoss": 5.569286452485369,
+  "bestObjective": 5.569286452485369,
+  "nHypotheses": 39517,
+  "metricsPath": "..\\reports\\runs\\gru_attention\\metrics.json"
+}

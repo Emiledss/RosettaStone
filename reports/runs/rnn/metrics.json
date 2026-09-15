@@ -1,0 +1,22 @@
+[
+  {
+    "run": "rnn",
+    "bin": "courte",
+    "n": 39092,
+    "sacrebleu": 0.5770375964038745,
+    "meteor": 0.07063443469365607,
+    "bertscorePrecision": 0.6964428424835205,
+    "bertscoreRecall": 0.6726148128509521,
+    "bertscoreF1": 0.6841131448745728
+  },
+  {
+    "run": "rnn",
+    "bin": "longue",
+    "n": 425,
+    "sacrebleu": 0.014412313111504095,
+    "meteor": 0.030568825705860246,
+    "bertscorePrecision": 0.6844466924667358,
+    "bertscoreRecall": 0.6239162087440491,
+    "bertscoreF1": 0.6525864601135254
+  }
+]

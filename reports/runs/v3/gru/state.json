@@ -1,0 +1,21 @@
+{
+  "steps": {
+    "train": "pending",
+    "generate": "pending",
+    "metrics": "pending"
+  },
+  "runId": "gru",
+  "params": {
+    "tokenizationMethod": "unigram",
+    "vocabSize": 6663,
+    "learningRate": 0.0024238590666922992,
+    "hiddenDim": 1024,
+    "embDim": 256,
+    "dropout": 0.0,
+    "teacherForcingDecay": 1.0,
+    "tokenizationConfig": "unigram6663"
+  },
+  "lastEpoch": 6,
+  "bestValLoss": 5.505077602027298,
+  "bestObjective": 5.505077602027298
+}
